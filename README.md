@@ -21,8 +21,8 @@ In order to use this tool, you need the following tools installed on your
 machine:
 - Python 3 (Tested with 3.8.2, but other 3.X versions should all be compatible)
 - The pip module `msgpack` (To work with the file format of the `cBpack` files)
-- Java(TM) SE Runtime Environment 1.8.0 or higher (for executing the AOSP
-  dictionary tool jar)
+- Java(TM) SE Runtime Environment 1.8.0 or higher when building AOSP Dictionary
+  files. Not required when making [Flictionaries](flictionary.md).
 
 This tool has been tested on Windows 10, but it should also run fine on Linux
 machines, as long as the above prerequisites are installed.
