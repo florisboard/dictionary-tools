@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# encoding: utf-8
+
 # Modify this list to add new entries which should be handled in the 'makeall'
 # bulk action.
 # Format:
