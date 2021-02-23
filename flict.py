@@ -185,9 +185,9 @@ class FlictRootNode(FlictNode):
 
 
 def clb_to_flict(src_path: str, dst_path: str):
-    word_regex = regex.compile(r"^\sword=(\p{L}\p{M}*)+,f=[0-9]+$")
-    bigram_regex = regex.compile(r"^\s\sbigram=(\p{L}\p{M}*)+,f=[0-9]+$")
-    trigram_rgeex = regex.compile(r"^\s\s\strigram=(\p{L}\p{M}*)+,f=[0-9]+$")
+    word_regex = regex.compile(r"^\sword=((\p{L}\p{M}*)|\'|\-)+,f=[0-9]+$")
+    bigram_regex = regex.compile(r"^\s\sbigram=((\p{L}\p{M}*)|\'|\-)+,f=[0-9]+$")
+    trigram_rgeex = regex.compile(r"^\s\s\strigram=((\p{L}\p{M}*)|\'|\-)+,f=[0-9]+$")
     try:
         ptree = FlictRootNode()
         with io.open(src_path, "r", encoding="utf-8") as f_src:

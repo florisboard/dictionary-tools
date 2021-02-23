@@ -4,13 +4,13 @@
 import gzip
 import msgpack
 import io
-import re
+import regex
 import time
 
-STR_FAIL_REGEX = "[.,]+"
+STR_VALIDATE_REGEX = r"^((\p{L}\p{M}*)|\'|\-)+$"
 
 def __validate_str(str):
-    return re.search(STR_FAIL_REGEX, str) == None and len(str) != 0
+    return regex.search(STR_VALIDATE_REGEX, str) != None and len(str) != 0
 
 def __freq_for_index(index, len_list):
     """
