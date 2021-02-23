@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 import io
+import regex
 from typing import Dict, List, Optional, Sized
 import unicodedata
 
@@ -105,13 +106,17 @@ class Ngram:
         self.tokens = tokens
         self.freq = freq
         self.shortcut = shortcut
+        self.shortcut_freq = shortcut_freq
+
+    def __repr__(self) -> str:
+        return f"Ngram {{ tokens={repr(self.tokens)}, freq={self.freq}, shortcut={self.shortcut}, shortcut_freq={self.shortcut_freq} }}"
 
 class FlictNode:
     def __init__(self, order: int, type: int, token: str, freq: Optional[int] = None):
         self.order: int = order
         self.type: int = type
         self.token: str = token
-        self.freq: Optional[int] = None
+        self.freq: Optional[int] = freq
         self.children: Dict[str, FlictNode] = {}
 
     def encode(self, byte_arr: bytearray):
@@ -134,6 +139,9 @@ class FlictNode:
         ## TODO: fix it
         FlictSpec.writeCmd(byte_arr, FlictSpec.CMDB_END, end_count=1)
 
+    def __repr__(self) -> str:
+        return f"FlictNode {{ order={self.order}, children={repr(self.children)} }}"
+
 class FlictRootNode(FlictNode):
     def __init__(self):
         self.header: Optional[str] = None
@@ -154,7 +162,9 @@ class FlictRootNode(FlictNode):
         for child_node in self.children.values():
             child_node.encode(byte_arr)
 
-    # !! Currently only supports n-grams with order=1
+    def __repr__(self) -> str:
+        return f"FlictRootNode {{ children={repr(self.children)} }}"
+
     def insertNgram(self, ngram: Ngram):
         ptree_node = self
         ngram_pos = 0
@@ -164,28 +174,49 @@ class FlictRootNode(FlictNode):
                 if not c in ptree_node.children:
                     ptree_node.children[c] = FlictNode(ngram_pos + 1, FlictSpec.ATTR_PTREE_NODE_TYPE_CHAR, c)
                 if pos + 1 >= len(token):
-                    ptree_node.children[c].type = FlictSpec.ATTR_PTREE_NODE_TYPE_WORD
-                    ptree_node.children[c].freq = ngram.freq
+                    if ngram_pos + 1 >= len(ngram.tokens):
+                        ptree_node.children[c].type = FlictSpec.ATTR_PTREE_NODE_TYPE_WORD
+                        ptree_node.children[c].freq = ngram.freq
+                    elif ptree_node.children[c].type == FlictSpec.ATTR_PTREE_NODE_TYPE_CHAR:
+                        ptree_node.children[c].type = FlictSpec.ATTR_PTREE_NODE_TYPE_WORD_FILLER
                 ptree_node = ptree_node.children[c]
                 pos += 1
             ngram_pos += 1
 
 
 def clb_to_flict(src_path: str, dst_path: str):
+    word_regex = regex.compile(r"^\sword=(\p{L}\p{M}*)+,f=[0-9]+$")
+    bigram_regex = regex.compile(r"^\s\sbigram=(\p{L}\p{M}*)+,f=[0-9]+$")
+    trigram_rgeex = regex.compile(r"^\s\s\strigram=(\p{L}\p{M}*)+,f=[0-9]+$")
     try:
         ptree = FlictRootNode()
         with io.open(src_path, "r", encoding="utf-8") as f_src:
             is_first = True
+            temp_words = []
             for line in f_src.readlines():
                 if is_first:
                     # Treat as header
                     ptree.header = line.rstrip()
                     is_first = False
                 else:
-                    line_list = line.rstrip()[6:].split(",f=")
-                    word = unicodedata.normalize("NFC", line_list[0])
-                    freq = int(line_list[1])
-                    ptree.insertNgram(Ngram([word], freq))
+                    l = line.rstrip()
+                    if word_regex.match(l) != None:
+                        order = 1
+                        left_index = 6
+                    elif bigram_regex.match(l) != None:
+                        order = 2
+                        left_index = 9
+                    elif trigram_rgeex.match(l) != None:
+                        order = 3
+                        left_index = 11
+                    else:
+                        raise ValueError(f"Invalid line provided: \"{l}\"")
+                    ll = l[left_index:].split(",f=")
+                    word = unicodedata.normalize("NFC", ll[0].strip())
+                    freq = int(ll[1])
+                    temp_words = temp_words[0:(order-1)]
+                    temp_words.append(word)
+                    ptree.insertNgram(Ngram(temp_words, freq))
         flict_bytes = bytearray()
         ptree.encode(flict_bytes, FlictSpec.VERSION_0)
         with io.open(dst_path, "wb") as f_dst:
@@ -196,4 +227,4 @@ def clb_to_flict(src_path: str, dst_path: str):
         return False
 
 if __name__ == "__main__":
-    clb_to_flict("./.dicttool/combined-list-en.txt", "./.dicttool/en.flict")
+    clb_to_flict("./.dicttool/test.clb", "./.dicttool/en.flict")

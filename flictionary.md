@@ -23,8 +23,8 @@ in sub-sequent versions (v2, v3, ...).
 ## General Structure
 Flictionaries allow for housing a unigram wordlist with frequencies, as well as
 storing n-gram models for next-word predictions. The file format does limit the
-size of the n-grams to the range unigram..8-gram, which should be more than
-sufficient to house a language model.
+size of the n-grams to the range unigram..8-gram (both inclusive), which should
+be more than sufficient to house a language model.
 
 In general, the basic skeleton structure behind each Flictionary is as follows:
 
