@@ -42,7 +42,7 @@ def make(src_def):
     os.makedirs(".dicttool", exist_ok=True)
     clb_path = f".dicttool/combined-list-{lang_code}.txt"
     if src_type == "cBpack":
-        clb.cBpack(lang_code, src_path, clb_path)
+        clb.cBpack(lang_code, src_path, ".srcin/swearWords.txt", clb_path)
     else:
         print("    Error: Unsupported src_type provided. Skipping this entry...\n")
         return False
