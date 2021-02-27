@@ -124,20 +124,20 @@ class FlictNode:
         FlictSpec.writeCmd(byte_arr, FlictSpec.CMDB_BEGIN_PTREE_NODE,
             size=len(token_arr)-1, type=self.type, order=self.order-1, freq=self.freq)
         byte_arr.extend(token_arr)
+        is_last_byte_end = False
         for child_node in self.children.values():
             child_node.encode(byte_arr)
-        # if (byte_arr[-1] & FlictSpec.MASK_END) == FlictSpec.CMDB_END:
-        #     last_end_count = (byte_arr[-1] & FlictSpec.ATTR_END_COUNT)
-        #     if last_end_count < FlictSpec.ATTR_END_COUNT_MAX:
-        #         del byte_arr[-1]
-        #         end_count = last_end_count + 1
-        #     else:
-        #         end_count = 1
-        # else:
-        #     end_count = 1
-        ## end_count always 1 on purpose because else there's a severe bug
-        ## TODO: fix it
-        FlictSpec.writeCmd(byte_arr, FlictSpec.CMDB_END, end_count=1)
+            is_last_byte_end = True
+        if is_last_byte_end:
+            last_end_count = (byte_arr[-1] & FlictSpec.ATTR_END_COUNT)
+            if last_end_count < FlictSpec.ATTR_END_COUNT_MAX:
+                end_count = last_end_count + 1
+                del byte_arr[-1]
+            else:
+                end_count = 1
+        else:
+            end_count = 1
+        FlictSpec.writeCmd(byte_arr, FlictSpec.CMDB_END, end_count=end_count)
 
     def __repr__(self) -> str:
         return f"FlictNode {{ order={self.order}, children={repr(self.children)} }}"

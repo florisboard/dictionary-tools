@@ -65,9 +65,9 @@ def cBpack(lang_code, src_path, swear_path, dst_path):
         for innerlist in data_sanitized:
             freq = __freq_for_index(index, len_list)
             for word in innerlist:
-                adjusted_freq = freq
-                for swear_word in swear_words:
-                    if swear_word in word:
-                        adjusted_freq = 0
+                if word in swear_words:
+                    adjusted_freq = 0
+                else:
+                    adjusted_freq = freq
                 f_dst.write(" word={},f={}\n".format(word, adjusted_freq))
             index += 1
