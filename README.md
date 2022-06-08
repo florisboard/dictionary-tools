@@ -1,3 +1,7 @@
+**This repository is deprecated beginning with FlorisBoard 0.4.0-alpha01 and is superseded by [florisboard/nlp](https://github.com/florisboard/nlp)! For the purpose of creating AOSP dictionares the scripts provided by this repo can still be used, however it will not be usable within FlorisBoard.**
+
+---
+
 # dictionary-tools
 Repository which hosts the tool(s) required to build a binary dictionary file
 from raw source set(s). Used for providing dictionary assets to FlorisBoard.
@@ -54,8 +58,8 @@ This repository only provides the tools for creating binary `.dict`/`.flict`
 files from various source formats. The actual source files have to be provided
 by yourself.
 
-The main purpose for this repository is to provide a useful tool for creating
-dictionaries which will be used in [FlorisBoard].
+~The main purpose for this repository is to provide a useful tool for creating
+dictionaries which will be used in [FlorisBoard].~
 Of course, this can also be used to create dictionary files for other
 open-source keyboards as well, as long as the dictionary format needed is also
 the binary output format (`.dict`).
